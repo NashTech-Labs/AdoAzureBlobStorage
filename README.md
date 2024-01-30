@@ -40,9 +40,9 @@ To call this in your pipeline you can follow this example:
     type: string
     default: YourDefaultSourceDirectory
 
-  - name: azureSubscription
+  - name: ARMserviceConnection
     type: string
-    default: YourAzureSubscription
+    default: ARMserviceConnection
 
   - name: resourceGroup
     type: string
@@ -66,16 +66,16 @@ To call this in your pipeline you can follow this example:
 
   steps:
 
-  - template: push.yml@Docker
+  - template: push.yml@blob
     parameters:
-        storageAccount
-        containerName
-        blobPrefix
-        sourceDirectory
-        azureSubscription
-        resourceGroup
-        location
-        accountKey
+        storageAccount:  "${{parameters.storageAccount}}"
+        containerName:   "${{parameters.containerName}}"
+        blobPrefix:      "${{parameters.blobPrefix}}"
+        sourceDirectory: "${{parameters.sourceDirectory}}"
+        ARMserviceConnection: "${{parameters.ARMserviceConnection}}"
+        resourceGroup: "${{parameters.resourceGroup}}"
+        location: "${{parameters.location}}"
+        accountKey: "${{parameters.accountKey}}"
   ```
 
 You can also use Variable Group and Azure Key Vault for values.
