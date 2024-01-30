@@ -1,0 +1,64 @@
+parameters:
+
+- name: ARMserviceConnection
+  type: string
+
+- name: storageAccount
+  type: string
+
+- name: containerName
+  type: string
+
+- name: blobPrefix
+  type: string
+
+- name: sourceDirectory
+  type: string
+
+- name: resourceGroup
+  type: string
+
+- name: location
+  type: string
+
+- name: accountKey
+  type: string
+
+steps:
+
+- task: AzureCLI@2
+  displayName: 'Azure CLI Script'
+  inputs:
+    azureSubscription: '${{ parameters.ARMserviceConnection}}'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      # Define the variables
+
+      storageAccount="${{ parameters.storageAccount}}"
+      containerName="${{ parameters.containerName}}"
+      blobPrefix="${{ parameters.blobPrefix}}"
+      sourceDirectory="${{ parameters.sourceDirectory}}"
+      resourceGroup="${{ parameters.resourceGroup}}"
+      location="${{ parameters.location}}"
+      accountKey="${{ parameters.accountKey}}"
+
+      echo "Checking if Storage Account '$storageAccount' exists..."
+
+      # Check if Storage Account exists
+      az storage account show --name $storageAccount &>/dev/null || az storage account create --name $storageAccount --resource-group $resourceGroup --location $location --sku Standard_LRS
+
+      echo "Checking if Container '$containerName' exists..."
+
+      # Check if Container exists
+      az storage container show --account-name $storageAccount --account-key $accountKey --name $containerName &>/dev/null || az storage container create --account-name $storageAccount --account-key $accountKey --name $containerName
+
+      echo "Creating blob url with prefix '$blobPrefix'..."
+
+      # Constructing the Blob URL
+      blobUrl="https://$storageAccount.blob.core.windows.net/$containerName/$blobPrefix"
+
+      echo "Uploading files from '$sourceDirectory' to '$blobUrl'"
+
+      # Initiating the cosmic file transfer with AZ CLI's azcopy
+      azcopy copy "$sourceDirectory/*" "$blobUrl" --recursive
