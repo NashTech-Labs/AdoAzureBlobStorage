@@ -60,7 +60,7 @@ To call this in your pipeline you can follow this example:
     repositories:
       - repository: blob
         type: github
-        name: NashTech-Labs/AzureDevOps.Tflint
+        name: NashTech-Labs/AdoAzureBlobStorage
         ref: main
         endpoint: 'GitHubServiceConnection'
 
